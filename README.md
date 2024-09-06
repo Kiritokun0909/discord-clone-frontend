@@ -1,2 +1,3 @@
 # discord-clone-frontend
-Clone Discord UI with TypeScript
+Project to clone Discord UI with TypeScript language and NextJS framework
+
