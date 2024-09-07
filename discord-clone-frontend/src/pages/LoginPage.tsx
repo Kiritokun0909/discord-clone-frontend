@@ -12,7 +12,7 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-purple-100">
+    <div className="flex items-center justify-center min-h-screen bg-gray-700">
       <form onSubmit={handleSubmit} className="bg-gray-800 text-white p-6 rounded-lg shadow-md max-w-md w-full">
         <h2 className="text-xl font-bold mb-4 text-center text-gray-300">Login to Discord</h2>
         <div className="mb-3">
