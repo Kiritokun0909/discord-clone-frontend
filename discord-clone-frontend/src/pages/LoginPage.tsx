@@ -1,20 +1,45 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAppDispatch } from '../hooks/reduxHooks';
+import { setUser } from '../redux/slices/userSlice';
+import { login, LoginData } from '../api/auth';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement login logic
-    console.log('Login attempt:', { email, password });
+    setError('');
+
+    const loginData: LoginData = {
+      username: email, // We're using email field for both email and username
+      password: password
+    };
+
+    try {
+      const result = await login(loginData);
+      // Assuming the login function returns user data on success
+      dispatch(setUser({
+        id: result.id,
+        username: result.username,
+        email: result.email,
+        avatarUrl: result.avatarUrl,
+      }));
+      navigate('/channels/@me');
+    } catch (error) {
+      setError('Invalid email/username or password');
+    }
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-700">
       <form onSubmit={handleSubmit} className="bg-gray-800 text-white p-6 rounded-lg shadow-md max-w-md w-full">
         <h2 className="text-xl font-bold mb-4 text-center text-gray-300">Login to Discord</h2>
+        {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
         <div className="mb-3">
           <label htmlFor="email" className="block text-sm font-bold mb-1 text-gray-300">
             Email or Username
