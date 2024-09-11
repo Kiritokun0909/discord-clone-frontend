@@ -8,6 +8,8 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
+
+import ProfilePage from './pages/ProfilePage';
 import ServerPage from './pages/ServerPage';
 
 import NotFoundPage from './pages/NotFoundPage';
@@ -43,6 +45,8 @@ function App() {
               
               <Route path="/channels/@me" element={<ServerPage />} />
               <Route path="/channels/:serverId" element={<ServerPage />} />
+
+              <Route path="/profile" element={<ProfilePage />} />
 
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
