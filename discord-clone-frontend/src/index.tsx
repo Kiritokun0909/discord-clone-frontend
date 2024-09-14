@@ -7,6 +7,8 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from './redux/store';
 import './index.css';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import { ChakraProvider } from '@chakra-ui/react';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -14,9 +16,13 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <App />
-      </PersistGate>
+      <ChakraProvider>
+      <GoogleOAuthProvider clientId="19601671254-t2dh9otav3us08tbappdst3gl8ulqi98.apps.googleusercontent.com">
+        <PersistGate loading={null} persistor={persistor}>
+          <App />
+        </PersistGate>
+      </GoogleOAuthProvider>
+      </ChakraProvider>
     </Provider>
   </React.StrictMode>
 );

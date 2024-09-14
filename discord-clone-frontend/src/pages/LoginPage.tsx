@@ -2,12 +2,15 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../hooks/reduxHooks';
 import { setUser } from '../redux/slices/userSlice';
-import { login, LoginData } from '../api/auth';
+import { login, LoginData, loginGoogle } from '../api/auth';
+import { GoogleLogin } from '@react-oauth/google';
+import { showToast } from '../utils/toast';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
@@ -16,7 +19,7 @@ const LoginPage: React.FC = () => {
     setError('');
 
     const loginData: LoginData = {
-      username: email, // We're using email field for both email and username
+      email: email, // We're using email field for both email and username
       password: password
     };
 
@@ -24,16 +27,49 @@ const LoginPage: React.FC = () => {
       const result = await login(loginData);
       // Assuming the login function returns user data on success
       dispatch(setUser({
-        id: result.id,
-        username: result.username,
-        email: result.email,
-        avatarUrl: result.avatarUrl,
+        id: result.user.id,
+        username: result.user.username,
+        email: result.user.email,
+        avatarUrl: result.user.avatarUrl,
+        accessToken: result.accessToken,
+        refreshToken: result.refreshToken,
       }));
       navigate('/channels/@me');
     } catch (error) {
       setError('Invalid email/username or password');
     }
   };
+
+  function handleError(): void {
+    showToast({
+      type: "error",
+      title: "Login Failed",
+      context: "Server has problem please try again later",
+    });
+  }
+
+  async function handleSuccess(credential: any): Promise<void> {
+    setLoading(true);
+    try {
+      const result = await loginGoogle(credential.credential);
+      dispatch(setUser({
+        id: result.user.id,
+        username: result.user.username,
+        email: result.user.email,
+        avatarUrl: result.user.avatarUrl,
+        accessToken: result.accessToken,
+        refreshToken: result.refreshToken,
+      }));
+    } catch (err) {
+      showToast({
+        type: "error",
+        title: "Login Failed",
+        context: "Server has problem please try again later",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-700">
@@ -77,6 +113,14 @@ const LoginPage: React.FC = () => {
         >
           Log In
         </button>
+        <div className="mt-4 text-center text-sm">
+          <GoogleLogin
+                  theme="filled_blue"
+                  width={"20vw"}
+                  onSuccess={handleSuccess}
+                  onError={handleError}
+            />
+        </div>
         <div className="mt-4 text-center text-sm">
           Need an account?{' '}
           <Link to="/register" className="text-purple-400 hover:underline">
