@@ -4,6 +4,12 @@ export interface LoginData {
   password: string;
 }
 
+export interface RegisterData {
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
 interface User {
   id: string;
   username: string;
@@ -50,13 +56,18 @@ export const login = async (data: LoginData): Promise<LoginResponse> => {
   return loginResponse;
 };
 
-export const register = async (data: LoginData & { email: string }): Promise<User> => {
+export const register = async (data: RegisterData): Promise<any> => {
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 500));
 
-  // In a real app, you would create a new user here
-  // For now, just return the example account
-  return exampleAccount;
+  let response; // Changed var to let for better scoping
+  try {
+    response = await server.post('api/auth/register', data);
+  } catch (error: any) {
+    throw new Error(error.response.data.description) // Return the error response instead of throwing
+  }
+
+  return response;
 };
 
 export interface LoginResponse {
