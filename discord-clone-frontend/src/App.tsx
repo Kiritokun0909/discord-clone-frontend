@@ -4,6 +4,7 @@ import {
   Route,
   Routes,
   useLocation,
+  Outlet,
 } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -18,6 +19,9 @@ import ServerPage from "./pages/ServerPage";
 
 import NotFoundPage from "./pages/NotFoundPage";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import HomeLayout from "./layouts/HomeLayout";
+import ChatLayout from "./layouts/ChatLayout";
+import Sidebar from "./components/Sidebar";
 
 const HeaderFooterWrapper: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -68,31 +72,34 @@ function App() {
                 }
               />
 
-              <Route
-                path="/channels/@me"
-                element={
-                  <ProtectedRoute requireAuth={true}>
-                    <ServerPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/channels/:serverId"
-                element={
-                  <ProtectedRoute requireAuth={true}>
-                    <ServerPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/profile"
-                element={
-                  <ProtectedRoute requireAuth={true}>
-                    <ProfilePage />
-                  </ProtectedRoute>
-                }
-              />
-
+              <Route element={<HomeLayout />}>
+                <Route
+                  path="/channels/@me"
+                  element={
+                    <ProtectedRoute requireAuth={true}>
+                      <ServerPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route element={<ChatLayout main={<Outlet />} />}>
+                  <Route
+                    path="/channels/:serverId"
+                    element={
+                      <ProtectedRoute requireAuth={true}>
+                        <ServerPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                </Route>
+                <Route
+                  path="/profile"
+                  element={
+                    <ProtectedRoute requireAuth={true}>
+                      <ProfilePage />
+                    </ProtectedRoute>
+                  }
+                />
+              </Route>
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </main>

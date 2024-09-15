@@ -1,15 +1,38 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { showToast } from '../utils/toast';
+import {RegisterData, register } from '../api/auth'; // Assuming the register function is exported from auth.ts
 
 const RegisterPage: React.FC = () => {
   const [email, setEmail] = useState('');
-  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement registration logic
-    console.log('Registration attempt:', { email, username, password });
+
+    if (password !== confirmPassword) {
+      showToast({ type: 'error', title: 'Registration Failed', context: 'Passwords do not match.' });
+      return;
+    }
+
+    try {
+      const dataRequest : RegisterData = {
+        email: email,
+        password: password,
+        confirmPassword: confirmPassword
+      }
+      const response = await register(dataRequest);
+      console.log(response);
+      if (response.status !== 200) {
+        throw new Error(response.data.description);
+      }
+
+      showToast({ type: 'success', title: 'Registration Successful', context: 'You can now log in.' });
+    } catch (error) {
+      const errorMessage = (error as Error).message || 'An unknown error occurred';
+      showToast({ type: 'error', title: 'Registration Failed', context: errorMessage });
+    }
   };
 
   return (
@@ -31,19 +54,6 @@ const RegisterPage: React.FC = () => {
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="username" className="block text-sm font-bold mb-1 text-gray-300">
-              Username
-            </label>
-            <input
-              type="text"
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
-          <div className="mb-6">
             <label htmlFor="password" className="block text-sm font-bold mb-1 text-gray-300">
               Password
             </label>
@@ -52,6 +62,19 @@ const RegisterPage: React.FC = () => {
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+          <div className="mb-6">
+            <label htmlFor="confirmPassword" className="block text-sm font-bold mb-1 text-gray-300">
+              Confirm Password
+            </label>
+            <input
+              type="password"
+              id="confirmPassword"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
