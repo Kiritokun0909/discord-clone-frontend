@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface UserState {
   id: string | null;
@@ -21,13 +21,16 @@ const initialState: UserState = {
 };
 
 const userSlice = createSlice({
-  name: 'user',
+  name: "user",
   initialState,
   reducers: {
-    setUser: (state, action: PayloadAction<Omit<UserState, 'isLoggedIn'>>) => {
+    setUser: (state, action: PayloadAction<Omit<UserState, "isLoggedIn">>) => {
       return { ...action.payload, isLoggedIn: true };
     },
-    setTokens: (state, action: PayloadAction<{ accessToken: string; refreshToken: string }>) => {
+    setTokens: (
+      state,
+      action: PayloadAction<{ accessToken: string; refreshToken: string }>,
+    ) => {
       return { ...state, ...action.payload };
     },
     updateUser: (state, action: PayloadAction<Partial<UserState>>) => {

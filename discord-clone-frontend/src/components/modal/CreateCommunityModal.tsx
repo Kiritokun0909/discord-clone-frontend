@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -17,31 +17,46 @@ import {
   Text,
   Flex,
   HStack,
-} from '@chakra-ui/react';
-
-const CreateCommunityModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
-  const [serverName, setServerName] = useState('');
-  const [serverDescription, setServerDescription] = useState('');
-  const [serverImage, setServerImage] = useState<File | null>(null);
+} from "@chakra-ui/react";
+import { uploadMedia } from "../../api/media";
+import { showToast } from "../../utils/toast";
+const CreateCommunityModal: React.FC<{
+  isOpen: boolean;
+  onClose: () => void;
+}> = ({ isOpen, onClose }) => {
+  const [communityName, setCommunityName] = useState("");
+  const [communityDescription, setCommunityDescription] = useState("");
+  const [communityImage, setCommunityImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0] || null;
     if (file) {
-      setServerImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      try {
+        setCommunityImage(file);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreview(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+        await uploadMedia(file);
+      } catch (error) {
+        showToast({
+          type: "error",
+          title: "Error uploading image",
+          context: "",
+        });
+      }
     }
   };
 
   const handleSubmit = () => {
-    // Handle server creation logic here
-    console.log('Server Name:', serverName);
-    console.log('Server Description:', serverDescription);
-    console.log('Server Image:', serverImage);
+    // Handle community creation logic here
+    console.log("Community Name:", communityName);
+    console.log("Community Description:", communityDescription);
+    console.log("Community Image:", communityImage);
     onClose();
   };
 
@@ -49,38 +64,43 @@ const CreateCommunityModal: React.FC<{ isOpen: boolean; onClose: () => void }> =
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent bg="gray.900" maxW="lg" mx="auto">
-        <ModalHeader color="white">Create Server</ModalHeader>
+        <ModalHeader color="white">Create Community</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           {imagePreview && (
             <Flex justify="center" mb={4}>
-              <Image src={imagePreview} alt="Server Image Preview" boxSize="200px" objectFit="cover" />
+              <Image
+                src={imagePreview}
+                alt="Community Image Preview"
+                boxSize="200px"
+                objectFit="cover"
+              />
             </Flex>
           )}
           <FormControl isRequired>
-            <FormLabel color="gray.300">Server Name</FormLabel>
+            <FormLabel color="gray.300">Community Name</FormLabel>
             <Input
-              value={serverName}
-              onChange={(e) => setServerName(e.target.value)}
-              placeholder="Enter server name"
+              value={communityName}
+              onChange={(e) => setCommunityName(e.target.value)}
+              placeholder="Enter community name"
               bg="gray.700"
               color="gray.300"
               border="1px solid gray.600"
             />
           </FormControl>
           <FormControl mt={4} isRequired>
-            <FormLabel color="gray.300">Server Description</FormLabel>
+            <FormLabel color="gray.300">Community Description</FormLabel>
             <Textarea
-              value={serverDescription}
-              onChange={(e) => setServerDescription(e.target.value)}
-              placeholder="Enter server description"
+              value={communityDescription}
+              onChange={(e) => setCommunityDescription(e.target.value)}
+              placeholder="Enter community description"
               bg="gray.700"
               color="gray.300"
               border="1px solid gray.600"
             />
           </FormControl>
           <FormControl mt={4}>
-            <FormLabel color="gray.300">Server Image</FormLabel>
+            <FormLabel color="gray.300">Community Image</FormLabel>
             <Box
               borderWidth={2}
               borderStyle="dashed"
@@ -100,9 +120,7 @@ const CreateCommunityModal: React.FC<{ isOpen: boolean; onClose: () => void }> =
                 id="image-file-input"
               />
               <label htmlFor="image-file-input">
-                <Text color="gray.400">
-                  Click or drag to upload image
-                </Text>
+                <Text color="gray.400">Click or drag to upload image</Text>
               </label>
             </Box>
           </FormControl>
@@ -110,7 +128,7 @@ const CreateCommunityModal: React.FC<{ isOpen: boolean; onClose: () => void }> =
         <ModalFooter justifyContent="center">
           <HStack spacing={4}>
             <Button colorScheme="blue" onClick={handleSubmit}>
-              <Text color="white">Create Server</Text>
+              <Text color="white">Create Community</Text>
             </Button>
             <Button variant="outline" colorScheme="blue" onClick={onClose}>
               <Text>Cancel</Text>
@@ -123,4 +141,3 @@ const CreateCommunityModal: React.FC<{ isOpen: boolean; onClose: () => void }> =
 };
 
 export default CreateCommunityModal;
-
