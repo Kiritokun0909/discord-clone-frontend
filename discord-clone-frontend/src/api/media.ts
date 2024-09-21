@@ -15,3 +15,12 @@ export const uploadMedia = async (fileMe: File): Promise<string> => {
     throw error; // Rethrow the error for further handling
   }
 };
+
+export const deleteMedia = async (mediaId: string) => {
+  try {
+    var response = await server.delete(`/api/media/${mediaId}`);
+    console.log(response.status);
+  } catch (error) {
+    throw error; // Rethrow the error for further handling
+  }
+};

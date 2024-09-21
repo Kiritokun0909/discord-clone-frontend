@@ -17,9 +17,11 @@ import {
   Text,
   Flex,
   HStack,
+  Spinner,
 } from "@chakra-ui/react";
 import { uploadMedia } from "../../api/media";
 import { showToast } from "../../utils/toast";
+
 const CreateCommunityModal: React.FC<{
   isOpen: boolean;
   onClose: () => void;
@@ -28,6 +30,7 @@ const CreateCommunityModal: React.FC<{
   const [communityDescription, setCommunityDescription] = useState("");
   const [communityImage, setCommunityImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleImageChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -41,7 +44,15 @@ const CreateCommunityModal: React.FC<{
           setImagePreview(reader.result as string);
         };
         reader.readAsDataURL(file);
+
+        setIsUploading(true); // Start uploading
         await uploadMedia(file);
+        setIsUploading(false); // Finished uploading
+        showToast({
+          type: "success",
+          title: "Image uploaded successfully",
+          context: "",
+        });
       } catch (error) {
         showToast({
           type: "error",
@@ -60,6 +71,10 @@ const CreateCommunityModal: React.FC<{
     onClose();
   };
 
+  const handleClose = () => {
+    onClose();
+  };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -69,14 +84,25 @@ const CreateCommunityModal: React.FC<{
         <ModalBody>
           {imagePreview && (
             <Flex justify="center" mb={4}>
-              <Image
-                src={imagePreview}
-                alt="Community Image Preview"
-                boxSize="200px"
-                objectFit="cover"
-              />
+              {isUploading ? (
+                <Spinner
+                  size="lg"
+                  color="blue.500"
+                  thickness="4px"
+                  speed="0.65s"
+                  emptyColor="gray.200"
+                />
+              ) : (
+                <Image
+                  src={imagePreview}
+                  alt="Community Image Preview"
+                  boxSize="200px"
+                  objectFit="cover"
+                />
+              )}
             </Flex>
           )}
+
           <FormControl isRequired>
             <FormLabel color="gray.300">Community Name</FormLabel>
             <Input
