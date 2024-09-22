@@ -77,7 +77,7 @@ function App() {
                   path="/channels/@me"
                   element={
                     <ProtectedRoute requireAuth={true}>
-                      <ServerPage />
+                      <HomePage />
                     </ProtectedRoute>
                   }
                 />

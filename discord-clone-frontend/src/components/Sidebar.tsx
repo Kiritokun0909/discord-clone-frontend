@@ -63,7 +63,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       alignItems="center"
       justifyContent="space-between"
     >
-      <VStack spacing={2} align="stretch" w="full">
+      <VStack gap={4} align="stretch" w="full">
         <Button
           w="50px"
           h="50px"
@@ -76,41 +76,49 @@ const Sidebar: React.FC<SidebarProps> = ({
         >
           <Text fontSize="2xl" fontWeight="bold" mt="0.3em">{user.username?.charAt(0).toUpperCase()}</Text>
         </Button>
-        <Divider my={2}/>
-        {communities.length > 0 && communities.map((community) => (
-          <React.Fragment key={community.id}>
-            <Tooltip label={community.name} placement="right">
-              <Button
-                w="50px"
-                h="50px"
-                borderRadius="full"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                bg={
-                  selectedCommunity?.id === community.id
-                    ? "purple.500"
-                    : community.id === "00000000-0000-0000-0000-000000000000"
-                    ? "blue.600"
-                    : "gray.700"
-                }
-                _hover={{
-                  bg:
-                  community.id === "00000000-0000-0000-0000-000000000000"
-                      ? "blue.500"
-                      : selectedCommunity?.id === community.id
-                      ? "purple.600"
-                      : "gray.600",
-                }}
-                onClick={() => onServerClick(community)}
-                bgSize="cover"
-                bgPosition="center"
-                bgImage={'https://preview.redd.it/2b-chibi-sd-avatar-even-her-in-game-sd-model-looks-pretty-v0-el897nv9njmb1.jpg?width=640&crop=smart&auto=webp&s=6d4142e96aea03322e1cc4ed21138e0dcc583536'}
-              >
-              </Button>
-            </Tooltip>
-          </React.Fragment>
-        ))}
+        <Divider my={1}/>
+        {
+          communities.length > 0 && communities.map((community) => (
+            <React.Fragment key={community.id}>
+              <Tooltip label={community.name} placement="right">
+                <Button
+                  w="50px"
+                  h="50px"
+                  borderRadius="full"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  bg={selectedCommunity?.id === community.id ? "purple.500" : "gray.700"}
+                  _hover={{
+                    filter: "brightness(0.5)",
+                  }}
+                  _focus={{
+                    boxShadow: "0 0 0 2px white"
+                  }}
+                  _active={{
+                    bg: "purple.600",
+                    transform: "scale(0.95)"
+                  }}
+                  onClick={() => onServerClick(community)}
+                  bgImage={community.imageUrl ? `url(${community.imageUrl})` : undefined}
+                  bgSize={community.imageUrl ? "cover" : undefined}
+                  bgPosition={community.imageUrl ? "center" : undefined}
+                  bgRepeat="no-repeat"
+                >
+                  {!community.imageUrl && (
+                    <Text
+                      fontSize="2xl"
+                      fontWeight="bold"
+                      color="white"
+                    >
+                      {community.name.charAt(0).toUpperCase()}
+                    </Text>
+                  )}
+                </Button>
+              </Tooltip>
+            </React.Fragment>
+          ))
+        }
 
       <Tooltip label="Create Community" placement="right">
         <Button
