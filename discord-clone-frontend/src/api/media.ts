@@ -1,6 +1,11 @@
 import { server } from "./base";
 
-export const uploadMedia = async (fileMe: File): Promise<string> => {
+export interface MediaUploadResponse {
+  fileId: string;
+  fileUrl: string;
+}
+
+export const uploadMedia = async (fileMe: File): Promise<MediaUploadResponse> => {
   const formData = new FormData();
   formData.append("mediaFile", fileMe);
 
@@ -10,7 +15,10 @@ export const uploadMedia = async (fileMe: File): Promise<string> => {
         "Content-Type": "multipart/form-data",
       },
     });
-    return response.data; // Assuming the response contains the uploaded file's URL or identifier
+    return {
+      fileId: response.data.fileId,
+      fileUrl: response.data.url,
+    };
   } catch (error) {
     throw error; // Rethrow the error for further handling
   }

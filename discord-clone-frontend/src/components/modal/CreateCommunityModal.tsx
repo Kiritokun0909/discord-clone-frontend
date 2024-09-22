@@ -19,17 +19,17 @@ import {
   HStack,
   Spinner,
 } from "@chakra-ui/react";
-import { uploadMedia } from "../../api/media";
+import { uploadMedia, deleteMedia } from "../../api/media";
 import { showToast } from "../../utils/toast";
-
+import { Community, createCommunity } from "../../api/community";
 const CreateCommunityModal: React.FC<{
   isOpen: boolean;
   onClose: () => void;
 }> = ({ isOpen, onClose }) => {
   const [communityName, setCommunityName] = useState("");
   const [communityDescription, setCommunityDescription] = useState("");
-  const [communityImage, setCommunityImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [mediaUploadedId, setMediaUploadedId] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
   const handleImageChange = async (
@@ -37,17 +37,21 @@ const CreateCommunityModal: React.FC<{
   ) => {
     const file = event.target.files?.[0] || null;
     if (file) {
+      setIsUploading(true); // Start uploading
+      
       try {
-        setCommunityImage(file);
+        if(mediaUploadedId !== null) {
+          await deleteMedia(mediaUploadedId);
+        }
         const reader = new FileReader();
         reader.onloadend = () => {
           setImagePreview(reader.result as string);
         };
         reader.readAsDataURL(file);
 
-        setIsUploading(true); // Start uploading
-        await uploadMedia(file);
-        setIsUploading(false); // Finished uploading
+        var data = await uploadMedia(file);
+        setImagePreview(data.fileUrl)
+        setMediaUploadedId(data.fileId);
         showToast({
           type: "success",
           title: "Image uploaded successfully",
@@ -59,16 +63,25 @@ const CreateCommunityModal: React.FC<{
           title: "Error uploading image",
           context: "",
         });
+      } finally {
+        setIsUploading(false);
       }
     }
   };
 
-  const handleSubmit = () => {
-    // Handle community creation logic here
-    console.log("Community Name:", communityName);
-    console.log("Community Description:", communityDescription);
-    console.log("Community Image:", communityImage);
-    onClose();
+  const handleSubmit = async () => {
+    try {
+      const createForm: Community = {
+        name: communityName,
+        description: communityDescription,
+        imageUrl: imagePreview,
+      };
+      const community = await createCommunity(createForm);
+      showToast({ type: 'success', title: 'Community created', context: 'Your community has been created successfully' });
+      onClose();
+    } catch (error: any) {
+      showToast({ type: 'error', title: 'Error creating community', context: error.message });
+    }
   };
 
   const handleClose = () => {

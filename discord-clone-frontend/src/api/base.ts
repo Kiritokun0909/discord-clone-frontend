@@ -2,7 +2,7 @@ import axios from "axios";
 import { store } from "../redux/store";
 import { setTokens, clearUser } from "../redux/slices/userSlice";
 import { useNavigate } from "react-router-dom";
-const API_BASE_URL = "http://localhost:5198";
+const API_BASE_URL = "http://localhost:50956";
 
 export const server = axios.create({
   baseURL: API_BASE_URL,
