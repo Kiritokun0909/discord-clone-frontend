@@ -21,7 +21,7 @@ import {
 } from "@chakra-ui/react";
 import { uploadMedia, deleteMedia } from "../../api/media";
 import { showToast } from "../../utils/toast";
-import { Community, createCommunity } from "../../api/community";
+import { CreateCommunityRequest, createCommunity } from "../../api/community";
 const CreateCommunityModal: React.FC<{
   isOpen: boolean;
   onClose: () => void;
@@ -71,7 +71,7 @@ const CreateCommunityModal: React.FC<{
 
   const handleSubmit = async () => {
     try {
-      const createForm: Community = {
+      const createForm: CreateCommunityRequest = {
         name: communityName,
         description: communityDescription,
         imageUrl: imagePreview,
@@ -85,11 +85,16 @@ const CreateCommunityModal: React.FC<{
   };
 
   const handleClose = () => {
+    setCommunityName("");
+    setCommunityDescription("");
+    setImagePreview(null);
+    setMediaUploadedId(null);
+    setIsUploading(false);
     onClose();
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={handleClose}>
       <ModalOverlay />
       <ModalContent bg="gray.900" maxW="lg" mx="auto">
         <ModalHeader color="white">Create Community</ModalHeader>
