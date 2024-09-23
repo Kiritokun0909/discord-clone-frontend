@@ -2,7 +2,7 @@ import React from 'react';
 
 const PrivacyPage: React.FC = () => {
   return (
-    <div className="bg-gray-800 text-white min-h-screen p-8">
+    <div className="bg-gray-700 text-white min-h-screen p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold mb-6">Privacy Policy</h1>
         <p className="mb-4">
@@ -34,10 +34,6 @@ const PrivacyPage: React.FC = () => {
         <h2 className="text-2xl font-semibold mt-8 mb-4">Changes to This Policy</h2>
         <p className="mb-4">
           We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page.
-        </p>
-
-        <p className="mt-8 text-sm text-gray-400">
-          Last updated: {new Date().toLocaleDateString()}
         </p>
       </div>
     </div>

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAppDispatch } from '../hooks/reduxHooks';
-import { setUser } from '../redux/slices/userSlice';
-import { login, LoginData, loginGoogle } from '../api/auth';
+import { useAppDispatch } from '../../hooks/reduxHooks';
+import { setUser } from '../../redux/slices/userSlice';
+import { login, LoginData, loginGoogle } from '../../api/auth';
 import { GoogleLogin } from '@react-oauth/google';
-import { showToast } from '../utils/toast';
+import { showToast } from '../../utils/toast';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');

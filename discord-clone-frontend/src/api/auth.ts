@@ -1,4 +1,3 @@
-import { AxiosResponse } from "axios";
 import { server } from "./base";
 export interface LoginData {
   email: string;
@@ -30,31 +29,35 @@ export const login = async (data: LoginData): Promise<LoginResponse> => {
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 500));
 
-  // Check if the provided credentials match the example account
-  // if ((data.email === exampleAccount.username || data.email === exampleAccount.email) && data.password === '123') {
-  //   return exampleAccount;
-  // } else {
-  //   throw new Error('Invalid username or password');
-  // }
-
-  const response = await server.post('api/auth/login', data)
-
-  if (response.status !== 200 || response.data === null) {
-    throw new Error('Login failed');
+  //Check if the provided credentials match the example account
+  if ((data.email === exampleAccount.username || data.email === exampleAccount.email) && data.password === '123') {
+    return {
+      user: exampleAccount,
+      accessToken: "123",
+      refreshToken: "123"
+    };
+  } else {
+    throw new Error('Invalid username or password');
   }
 
-  const loginResponse : LoginResponse = {
-    user: {
-      id: response.data.user.id,
-      username: response.data.user.name,
-      email: response.data.user.email,
-      avatarUrl: response.data.user.avatarUrl,
-    },
-    accessToken: response.data.accessToken,
-    refreshToken: response.data.refreshToken
-  };
+  // const response = await server.post('api/auth/login', data)
+
+  // if (response.status !== 200 || response.data === null) {
+  //   throw new Error('Login failed');
+  // }
+
+  // const loginResponse : LoginResponse = {
+  //   user: {
+  //     id: response.data.user.id,
+  //     username: response.data.user.name,
+  //     email: response.data.user.email,
+  //     avatarUrl: response.data.user.avatarUrl,
+  //   },
+  //   accessToken: response.data.accessToken,
+  //   refreshToken: response.data.refreshToken
+  // };
   
-  return loginResponse;
+  // return loginResponse;
 };
 
 export const register = async (data: RegisterData): Promise<any> => {

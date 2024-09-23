@@ -2,7 +2,7 @@ import React from 'react';
 
 const TermsPage: React.FC = () => {
   return (
-    <div className="bg-gray-800 text-white min-h-screen p-8">
+    <div className="bg-gray-700 text-white min-h-screen p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold mb-6">Terms of Service</h1>
         <p className="mb-4">
@@ -37,10 +37,6 @@ const TermsPage: React.FC = () => {
         <h2 className="text-2xl font-semibold mt-8 mb-4">6. Changes to Terms</h2>
         <p className="mb-4">
           We may revise these Terms of Service at any time without notice. By using Discord, you agree to be bound by the current version of these Terms of Service.
-        </p>
-
-        <p className="mt-8 text-sm text-gray-400">
-          Last updated: {new Date().toLocaleDateString()}
         </p>
       </div>
     </div>

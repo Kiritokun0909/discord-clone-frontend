@@ -32,7 +32,30 @@ export const createCommunity = async (createForm : CreateCommunityRequest): Prom
     }
 }
 
+export const mockCommunities: CommunityResponse[] = [
+    {
+      id: "1",
+      name: "JavaScript Enthusiasts",
+      description: "A community for people who love JavaScript",
+      imageUrl: null
+    },
+    {
+      id: "2",
+      name: "React Developers",
+      description: "All about React and its ecosystem",
+      imageUrl: "https://example.com/react.png"
+    },
+    {
+      id: "3",
+      name: "TypeScript Coders",
+      description: "Learn and grow with TypeScript",
+      imageUrl: null
+    }
+  ];
+
 export const getCommunities = async (): Promise<CommunityResponse[]> => {
+    return mockCommunities;
+
     await new Promise(resolve => setTimeout(resolve, 500));
     const response = await server.get<CommunityResponse[]>('api/community/user')
     if(response.status !== 200) throw new Error("Failed to get communities");
