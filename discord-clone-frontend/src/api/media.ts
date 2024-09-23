@@ -1,19 +1,34 @@
-import { server } from './base';
+import { server } from "./base";
 
-export const uploadMedia = async (fileMe: File): Promise<string> => {
+export interface MediaUploadResponse {
+  fileId: string;
+  fileUrl: string;
+}
+
+export const uploadMedia = async (fileMe: File): Promise<MediaUploadResponse> => {
   const formData = new FormData();
-  formData.append('mediaFile', fileMe);
+  formData.append("mediaFile", fileMe);
 
   try {
-    const response = await server.post('/api/media/upload', formData, {
+    const response = await server.post("/api/media/upload", formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        "Content-Type": "multipart/form-data",
       },
     });
-
-    return response.data; // Assuming the response contains the uploaded file's URL or identifier
+    return {
+      fileId: response.data.fileId,
+      fileUrl: response.data.url,
+    };
   } catch (error) {
-    console.error('Error uploading media:', error);
+    throw error; // Rethrow the error for further handling
+  }
+};
+
+export const deleteMedia = async (mediaId: string) => {
+  try {
+    var response = await server.delete(`/api/media/${mediaId}`);
+    console.log(response.status);
+  } catch (error) {
     throw error; // Rethrow the error for further handling
   }
 };

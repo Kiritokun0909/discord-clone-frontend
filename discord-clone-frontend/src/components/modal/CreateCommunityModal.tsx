@@ -17,51 +17,84 @@ import {
   Text,
   Flex,
   HStack,
+  Spinner,
 } from "@chakra-ui/react";
-import { uploadMedia } from "../../api/media";
+import { uploadMedia, deleteMedia } from "../../api/media";
 import { showToast } from "../../utils/toast";
+import { CreateCommunityRequest, createCommunity } from "../../api/community";
 const CreateCommunityModal: React.FC<{
   isOpen: boolean;
   onClose: () => void;
 }> = ({ isOpen, onClose }) => {
   const [communityName, setCommunityName] = useState("");
   const [communityDescription, setCommunityDescription] = useState("");
-  const [communityImage, setCommunityImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [mediaUploadedId, setMediaUploadedId] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleImageChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = event.target.files?.[0] || null;
     if (file) {
+      setIsUploading(true); // Start uploading
+      
       try {
-        setCommunityImage(file);
+        if(mediaUploadedId !== null) {
+          await deleteMedia(mediaUploadedId);
+        }
         const reader = new FileReader();
         reader.onloadend = () => {
           setImagePreview(reader.result as string);
         };
         reader.readAsDataURL(file);
-        await uploadMedia(file);
+
+        var data = await uploadMedia(file);
+        setImagePreview(data.fileUrl)
+        setMediaUploadedId(data.fileId);
+        showToast({
+          type: "success",
+          title: "Image uploaded successfully",
+          context: "",
+        });
       } catch (error) {
         showToast({
           type: "error",
           title: "Error uploading image",
           context: "",
         });
+      } finally {
+        setIsUploading(false);
       }
     }
   };
 
-  const handleSubmit = () => {
-    // Handle community creation logic here
-    console.log("Community Name:", communityName);
-    console.log("Community Description:", communityDescription);
-    console.log("Community Image:", communityImage);
+  const handleSubmit = async () => {
+    try {
+      const createForm: CreateCommunityRequest = {
+        name: communityName,
+        description: communityDescription,
+        imageUrl: imagePreview,
+      };
+      const community = await createCommunity(createForm);
+      showToast({ type: 'success', title: 'Community created', context: 'Your community has been created successfully' });
+      onClose();
+    } catch (error: any) {
+      showToast({ type: 'error', title: 'Error creating community', context: error.message });
+    }
+  };
+
+  const handleClose = () => {
+    setCommunityName("");
+    setCommunityDescription("");
+    setImagePreview(null);
+    setMediaUploadedId(null);
+    setIsUploading(false);
     onClose();
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={handleClose}>
       <ModalOverlay />
       <ModalContent bg="gray.900" maxW="lg" mx="auto">
         <ModalHeader color="white">Create Community</ModalHeader>
@@ -69,14 +102,25 @@ const CreateCommunityModal: React.FC<{
         <ModalBody>
           {imagePreview && (
             <Flex justify="center" mb={4}>
-              <Image
-                src={imagePreview}
-                alt="Community Image Preview"
-                boxSize="200px"
-                objectFit="cover"
-              />
+              {isUploading ? (
+                <Spinner
+                  size="lg"
+                  color="blue.500"
+                  thickness="4px"
+                  speed="0.65s"
+                  emptyColor="gray.200"
+                />
+              ) : (
+                <Image
+                  src={imagePreview}
+                  alt="Community Image Preview"
+                  boxSize="200px"
+                  objectFit="cover"
+                />
+              )}
             </Flex>
           )}
+
           <FormControl isRequired>
             <FormLabel color="gray.300">Community Name</FormLabel>
             <Input

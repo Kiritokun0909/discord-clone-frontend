@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Flex,
   VStack,
@@ -6,12 +6,13 @@ import {
   Text,
   Tooltip,
   Divider,
-  Box,
   Icon,
 } from "@chakra-ui/react";
 import { AddIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import { store } from "../redux/store";
 import CreateCommunityModal from './modal/CreateCommunityModal'; // Import the CreateCommunityModal
+import { CommunityResponse, getCommunities } from "../api/community";
+import { showToast } from "../utils/toast";
 
 export interface Server {
   id: number;
@@ -20,18 +21,28 @@ export interface Server {
 }
 
 interface SidebarProps {
-  servers: Server[];
-  selectedServer: Server | null;
-  onServerClick: (server: Server) => void;
+  onServerClick: (server: CommunityResponse) => void;
   onLogout: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
-  servers,
-  selectedServer,
   onServerClick,
   onLogout,
 }) => {
+  const [selectedCommunity, setselectedCommunity] = useState<CommunityResponse | null>(null);
+  const [communities, setCommunities] = useState<CommunityResponse[]>([]);
+  const fetchCommunities = async () => {
+    try {
+      const communitiesResponse = await getCommunities();
+      setCommunities(communitiesResponse);
+    } catch (error : any) {
+      showToast({ type: 'error', title: 'Error fetching communities', context: error.message });
+    }
+  };
+  useEffect(() => {
+    fetchCommunities();
+  }, []); // Call the fetchCommunities function only once when the component mounts
+
   const user = store.getState().user;
   const [isModalOpen, setIsModalOpen] = useState(false); // State to control modal visibility
   
@@ -52,7 +63,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       alignItems="center"
       justifyContent="space-between"
     >
-      <VStack spacing={2} align="stretch" w="full">
+      <VStack gap={4} align="stretch" w="full">
         <Button
           w="50px"
           h="50px"
@@ -65,41 +76,49 @@ const Sidebar: React.FC<SidebarProps> = ({
         >
           <Text fontSize="2xl" fontWeight="bold" mt="0.3em">{user.username?.charAt(0).toUpperCase()}</Text>
         </Button>
-        <Divider my={2}/>
-        {servers.map((server) => (
-          <React.Fragment key={server.id}>
-            <Tooltip label={server.name} placement="right">
-              <Button
-                w="50px"
-                h="50px"
-                borderRadius="full"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                bg={
-                  selectedServer?.id === server.id
-                    ? "purple.500"
-                    : server.id === 0
-                    ? "blue.600"
-                    : "gray.700"
-                }
-                _hover={{
-                  bg:
-                    server.id === 0
-                      ? "blue.500"
-                      : selectedServer?.id === server.id
-                      ? "purple.600"
-                      : "gray.600",
-                }}
-                onClick={() => onServerClick(server)}
-                bgSize="cover"
-                bgPosition="center"
-                bgImage={'https://preview.redd.it/2b-chibi-sd-avatar-even-her-in-game-sd-model-looks-pretty-v0-el897nv9njmb1.jpg?width=640&crop=smart&auto=webp&s=6d4142e96aea03322e1cc4ed21138e0dcc583536'}
-              >
-              </Button>
-            </Tooltip>
-          </React.Fragment>
-        ))}
+        <Divider my={1}/>
+        {
+          communities.length > 0 && communities.map((community) => (
+            <React.Fragment key={community.id}>
+              <Tooltip label={community.name} placement="right">
+                <Button
+                  w="50px"
+                  h="50px"
+                  borderRadius="full"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  bg={selectedCommunity?.id === community.id ? "purple.500" : "gray.700"}
+                  _hover={{
+                    filter: "brightness(0.5)",
+                  }}
+                  _focus={{
+                    boxShadow: "0 0 0 2px white"
+                  }}
+                  _active={{
+                    bg: "purple.600",
+                    transform: "scale(0.95)"
+                  }}
+                  onClick={() => onServerClick(community)}
+                  bgImage={community.imageUrl ? `url(${community.imageUrl})` : undefined}
+                  bgSize={community.imageUrl ? "cover" : undefined}
+                  bgPosition={community.imageUrl ? "center" : undefined}
+                  bgRepeat="no-repeat"
+                >
+                  {!community.imageUrl && (
+                    <Text
+                      fontSize="2xl"
+                      fontWeight="bold"
+                      color="white"
+                    >
+                      {community.name.charAt(0).toUpperCase()}
+                    </Text>
+                  )}
+                </Button>
+              </Tooltip>
+            </React.Fragment>
+          ))
+        }
 
       <Tooltip label="Create Community" placement="right">
         <Button
